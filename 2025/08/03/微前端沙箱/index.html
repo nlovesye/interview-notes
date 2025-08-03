@@ -4,20 +4,19 @@
   <meta charset="utf-8">
   
   
-  <title>浏览器缓存机制 | 前端面试笔记</title>
+  <title>微前端沙箱 | 前端面试笔记</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="浏览器缓存机制也就是我们说的http缓存机制，根据http报文的缓存标识进行的。 http报文分为请求报文和响应报文 请求报文格式：请求行-http头（通用信息头，请求头，实体头）-请求报文主体（只有post才有报文主题） 响应报文格式：状态行-http头（通用信息头，响应头，实体头）-响应报文主体 注：通用信息头指的是请求和响应都支持的头域。这里只是为了方便理解，将通用信息头，请求&#x2F;响">
+  <meta name="description" content="JS沙箱 window快照还原  Proxy沙箱基于Proxy实现，使用Proxy代理window对象实现js沙箱隔离 Snapshot沙箱基于Snapshot实现，active和inactive激活和恢复window的快照，适用于不支持Proxy的场景，简洁   iframe利用iframe硬隔离。优点：隔离良好。缺点：与主线程通信都需要通过postMessage，易用性与message序列化带">
 <meta property="og:type" content="article">
-<meta property="og:title" content="浏览器缓存机制">
-<meta property="og:url" content="https://nlovesye.github.io/interview-notes/2023/08/23/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:title" content="微前端沙箱">
+<meta property="og:url" content="https://nlovesye.github.io/interview-notes/2025/08/03/%E5%BE%AE%E5%89%8D%E7%AB%AF%E6%B2%99%E7%AE%B1/index.html">
 <meta property="og:site_name" content="前端面试笔记">
-<meta property="og:description" content="浏览器缓存机制也就是我们说的http缓存机制，根据http报文的缓存标识进行的。 http报文分为请求报文和响应报文 请求报文格式：请求行-http头（通用信息头，请求头，实体头）-请求报文主体（只有post才有报文主题） 响应报文格式：状态行-http头（通用信息头，响应头，实体头）-响应报文主体 注：通用信息头指的是请求和响应都支持的头域。这里只是为了方便理解，将通用信息头，请求&#x2F;响">
+<meta property="og:description" content="JS沙箱 window快照还原  Proxy沙箱基于Proxy实现，使用Proxy代理window对象实现js沙箱隔离 Snapshot沙箱基于Snapshot实现，active和inactive激活和恢复window的快照，适用于不支持Proxy的场景，简洁   iframe利用iframe硬隔离。优点：隔离良好。缺点：与主线程通信都需要通过postMessage，易用性与message序列化带">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-08-23T18:01:34.000Z">
+<meta property="article:published_time" content="2025-08-03T04:40:30.303Z">
 <meta property="article:modified_time" content="2025-08-03T04:40:30.303Z">
 <meta property="article:author" content="ns">
-<meta property="article:tag" content="http">
-<meta property="article:tag" content="浏览器">
+<meta property="article:tag" content="前端">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/interview-notes/atom.xml" title="前端面试笔记" type="application/atom+xml">
@@ -85,12 +84,16 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-浏览器缓存机制" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-微前端沙箱" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/interview-notes/2023/08/23/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/" class="article-date">
-  <time class="dt-published" datetime="2023-08-23T18:01:34.000Z" itemprop="datePublished">2023-08-23</time>
+    <a href="/interview-notes/2025/08/03/%E5%BE%AE%E5%89%8D%E7%AB%AF%E6%B2%99%E7%AE%B1/" class="article-date">
+  <time class="dt-published" datetime="2025-08-03T04:40:30.303Z" itemprop="datePublished">2025-08-03</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/interview-notes/categories/%E5%89%8D%E7%AB%AF/">前端</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
@@ -99,7 +102,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      浏览器缓存机制
+      微前端沙箱
     </h1>
   
 
@@ -107,56 +110,30 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p><strong>浏览器缓存机制也就是我们说的http缓存机制，根据http报文的缓存标识进行的。</strong></p>
-<p>http报文分为请求报文和响应报文</p>
-<p>请求报文格式：请求行-http头（通用信息头，请求头，实体头）-请求报文主体（只有post才有报文主题）</p>
-<p>响应报文格式：状态行-http头（通用信息头，响应头，实体头）-响应报文主体</p>
-<p>注：通用信息头指的是请求和响应都支持的头域。这里只是为了方便理解，将通用信息头，请求&#x2F;响应头，实体头都归为了http头。</p>
-<h3 id="缓存过程"><a href="#缓存过程" class="headerlink" title="缓存过程"></a>缓存过程</h3><ul>
-<li>浏览器每次发起请求，都会先在浏览器缓存中查找该请求的结果以及缓存标识</li>
-<li>浏览器每次拿到返回的请求结果都会将该结果和缓存标识存入浏览器缓存中</li>
-</ul>
-<h3 id="强制缓存"><a href="#强制缓存" class="headerlink" title="强制缓存"></a>强制缓存</h3><p>  向浏览器缓存查找该请求结果，并根据该结果的缓存规则决定是否使用该缓存结果的过程，主要有三种情况：</p>
-<ol>
-<li>不存在该缓存结果和标识，强制缓存失效，直接向服务器发起请求</li>
-<li>存在该缓存结果和标识，但该结果已失效，强制缓存失效，使用协商缓存</li>
-<li>存在该缓存结果和标识且结果尚未失效，强制缓存生效，直接返回该结果</li>
-</ol>
-<p>  强制缓存规则 - 当浏览器向服务器发起请求时，服务器会将缓存规则放入http响应报文的http头中和请求结果一起返回给浏览器，控制强制缓存的字段分别是Expires和Cache-Control，其中Cache-Control优先级比Expires高。</p>
-<p>  Expires的值是服务器返回该请求结果缓存的到期时间，即再次发起请求时，如果客户端的时间小于Expires的值时，直接使用缓存结果。</p>
-<p>  Cache-Control主要取值为：<br>    - <strong>public</strong>：所有内容都将被缓存（客户端和代理服务器都可缓存）<br>    - <strong>private（Cache-Control的默认取值）</strong>：所有内容只有客户端可以缓存<br>    - <strong>no-cache</strong>：客户端缓存内容，但是是否使用缓存则需要经过协商缓存来验证决定<br>    - <strong>no-store</strong>：所有内容都不会被缓存，既不使用强制缓存，也不使用协商缓存<br>    - <strong>max-age&#x3D;xxx</strong>：缓存内容将在xxx秒后失效</p>
-<p>  注：在无法确定客户端时间是否与服务端的时间同步的情况下，Cache-Control相比于Expires时更好的选择，所以同时存在时，只有Cache-Control生效</p>
-<h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>  协商缓存就是在强制缓存失效后，浏览器携带缓存标识向服务器发起请求，由服务器根据缓存标识决定是否使用缓存的过程，主要有两种情况：</p>
-<ol>
-<li>协商缓存生效，返回304</li>
-<li>协商缓存失效，返回200和请求结果</li>
-</ol>
-<p>  协商缓存的标识也是在响应报文的http头中和请求结果一起返回给浏览器的，控制协商缓存的字段分别有：Last-Modified&#x2F;If-Modified-Since和Etag&#x2F;If-None-Match，其中Etag&#x2F;If-None-Match优先级比Last-Modified&#x2F;If-Modified-Since高。</p>
-<blockquote>
-<p><strong>Last-Modified&#x2F;If-Modified-Since</strong></p>
-</blockquote>
+        <h2 id="JS沙箱"><a href="#JS沙箱" class="headerlink" title="JS沙箱"></a>JS沙箱</h2><ul>
+<li><p>window快照还原</p>
 <ul>
-<li>Last-Modified是服务器响应请求时，返回该资源文件在服务器最后被修改的时间。</li>
-<li>If-Modified-Since是客户端再次发起请求时，携带上次请求返回的Last-Modified值。服务器收到请求后，发现包含If-Modified-Since字段，根据该字段的值与该资源在服务器的最后被修改时间做对比，根据对比结果重新返回资源（状态码200）或者使用缓存文件（状态码304）。</li>
+<li>Proxy沙箱<br>基于Proxy实现，使用Proxy代理window对象实现js沙箱隔离</li>
+<li>Snapshot沙箱<br>基于Snapshot实现，active和inactive激活和恢复window的快照，适用于不支持Proxy的场景，简洁</li>
 </ul>
-<blockquote>
-<p><strong>Etag&#x2F;If-None-Match</strong></p>
-</blockquote>
-<ul>
-<li>Etag是服务器响应请求时，返回当前资源文件的一个唯一标识（由服务器生成）。</li>
-<li>If-None-Match是客户端再次发起请求时，携带上次请求返回的唯一标识Etag值。服务器收到请求后，发现包含If-None-Match字段，根据该字段的值与该资源在服务器的Etag值做对比，根据对比结果重新返回资源（状态码200）或者使用缓存文件（状态码304）。</li>
+</li>
+<li><p>iframe<br>利用iframe硬隔离。优点：隔离良好。缺点：与主线程通信都需要通过postMessage，易用性与message序列化带来的性能问题影响。</p>
+</li>
+<li><p>Realm<br>可以使用with+Proxy实现</p>
+</li>
 </ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>  强制缓存优先于协商缓存进行，若生效则直接使用缓存，若不生效则进行协商缓存，协商缓存由服务器决定是否使用缓存，若协商缓存失效，则代表该请求的缓存失效，重新获取请求，再存入浏览器缓存中；生效则返回304，继续使用缓存。</p>
-<p>参考原文链接：<a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903593275817998">测地理解浏览器的缓存机制</a></p>
+<h2 id="CSS沙箱"><a href="#CSS沙箱" class="headerlink" title="CSS沙箱"></a>CSS沙箱</h2><ul>
+<li>ShadowDOM<br>创建ShadowDOM，使子应用css不影响外部css</li>
+</ul>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://nlovesye.github.io/interview-notes/2023/08/23/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/" data-id="cmdv70zaa001bmb7z5jl2e5k8" data-title="浏览器缓存机制" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://nlovesye.github.io/interview-notes/2025/08/03/%E5%BE%AE%E5%89%8D%E7%AB%AF%E6%B2%99%E7%AE%B1/" data-id="cmdv70za80013mb7z4cvd3tus" data-title="微前端沙箱" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/interview-notes/tags/http/" rel="tag">http</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/interview-notes/tags/%E6%B5%8F%E8%A7%88%E5%99%A8/" rel="tag">浏览器</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/interview-notes/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
 
     </footer>
   </div>
@@ -164,19 +141,19 @@
     
 <nav id="article-nav">
   
-    <a href="/interview-notes/2023/08/24/cookies-sessionStorage-localStorage%E5%8C%BA%E5%88%AB/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/interview-notes/2025/08/03/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">前一篇</strong>
       <div class="article-nav-title">
         
-          cookies,sessionStorage,localStorage区别
+          单点登录
         
       </div>
     </a>
   
   
-    <a href="/interview-notes/2023/08/23/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%B7%A8%E5%9F%9F/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/interview-notes/2025/08/03/Node.js%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">后一篇</strong>
-      <div class="article-nav-title">浏览器跨域</div>
+      <div class="article-nav-title">Node.js事件循环</div>
     </a>
   
 </nav>
